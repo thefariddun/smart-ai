@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartai
+    username: postgres
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml
