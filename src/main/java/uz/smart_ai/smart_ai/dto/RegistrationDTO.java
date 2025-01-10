@@ -1,10 +1,15 @@
 package uz.smart_ai.smart_ai.dto;
 
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RegistrationDTO {
 
+    @NotBlank(message = "Ismni kiriting")
     private String name;
+    @NotBlank(message = "Telefon raqamni kiriting")
     private String phoneNumber;
+    @NotBlank(message = "Parol kiriting")
     private String password;
 
     public String getName() {
