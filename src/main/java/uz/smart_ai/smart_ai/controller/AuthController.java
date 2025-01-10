@@ -1,5 +1,6 @@
 package uz.smart_ai.smart_ai.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/registration")
-    public ResponseEntity<String> registration(@RequestBody RegistrationDTO registrationDTO) {
+    public ResponseEntity<String> registration(@Valid @RequestBody RegistrationDTO registrationDTO) {
        return ResponseEntity.ok().body(authService.registration(registrationDTO));
     }
 }
