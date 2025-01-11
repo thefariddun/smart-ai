@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.smart_ai.smart_ai.dto.RegistrationDTO;
 import uz.smart_ai.smart_ai.entity.User;
 import uz.smart_ai.smart_ai.enums.GeneralStatus;
+import uz.smart_ai.smart_ai.enums.UserRoles;
 import uz.smart_ai.smart_ai.exceptions.BadException;
 import uz.smart_ai.smart_ai.repository.UserRepository;
 
@@ -23,6 +24,8 @@ public class AuthService {
     private UserRepository userRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private RoleService roleService;
 
     public String registration(RegistrationDTO registrationDTO) {
         logger.info("registration");
@@ -31,8 +34,8 @@ public class AuthService {
         if (user.isPresent()) {
             User existingUser = user.get();
             if (existingUser.getStatus().equals(GeneralStatus.IN_REGISTER)) {
+                roleService.deleteRoles(existingUser.getId());
                 userRepository.delete(existingUser);
-                //send sms
             } else {
                 throw new BadException("Foydalanuvchi allaqachon mavjud");
             }
@@ -45,6 +48,7 @@ public class AuthService {
         newUser.setVisible(true);
         newUser.setCreatedDate(LocalDateTime.now());
         userRepository.save(newUser);
+        roleService.save(UserRoles.ROLE_USER, newUser.getId());
         return null;
     }
 }
