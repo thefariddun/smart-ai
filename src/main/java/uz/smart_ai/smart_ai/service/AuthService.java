@@ -26,6 +26,10 @@ public class AuthService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private EmailSendingService emailSendingService;
+    @Autowired
+    private UserService userService;
 
     public String registration(RegistrationDTO registrationDTO) {
         logger.info("registration");
@@ -49,6 +53,16 @@ public class AuthService {
         newUser.setCreatedDate(LocalDateTime.now());
         userRepository.save(newUser);
         roleService.save(UserRoles.ROLE_USER, newUser.getId());
-        return null;
+        emailSendingService.sendRegistrationEmail(registrationDTO.getPhoneNumber(), newUser.getId());
+        return "Tizimga kirdingiz";
+    }
+
+    public String regVerification(Long id) {
+        User user = userService.getById(id);
+        if (user.getStatus().equals(GeneralStatus.IN_REGISTER)) {
+            userRepository.changeStatus(id, GeneralStatus.ACTIVE);
+            return "Tizimga muvaffaqiyatli kirdingiz";
+        }
+        throw new BadException("Muvaffaqiyatsiz urinish");
     }
 }

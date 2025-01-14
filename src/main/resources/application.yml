@@ -1,10 +1,21 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/smartai
-    username: postgres
-    password: admin
+    username: *
+    password: *
   jpa:
     hibernate:
       ddl-auto: update
   liquibase:
     change-log: classpath:/db/changelog/master.xml
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: *
+    password: *
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+
