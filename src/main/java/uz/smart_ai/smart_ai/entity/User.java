@@ -20,6 +20,24 @@ public class User {
     private GeneralStatus status;
     private Boolean visible = Boolean.TRUE;
     private LocalDateTime createdDate;
+    private String verificationCode;
+    private LocalDateTime codeExpirationTime;
+
+    public String getVerificationCode() {
+        return verificationCode;
+    }
+
+    public void setVerificationCode(String verificationCode) {
+        this.verificationCode = verificationCode;
+    }
+
+    public LocalDateTime getCodeExpirationTime() {
+        return codeExpirationTime;
+    }
+
+    public void setCodeExpirationTime(LocalDateTime codeExpirationTime) {
+        this.codeExpirationTime = codeExpirationTime;
+    }
 
     public Long getId() {
         return id;

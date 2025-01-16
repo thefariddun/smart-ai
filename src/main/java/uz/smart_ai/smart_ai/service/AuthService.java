@@ -14,6 +14,7 @@ import uz.smart_ai.smart_ai.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class AuthService {
@@ -51,10 +52,14 @@ public class AuthService {
         newUser.setStatus(GeneralStatus.IN_REGISTER);
         newUser.setVisible(true);
         newUser.setCreatedDate(LocalDateTime.now());
+
+        String verificationCode = generateVerificationCode(6);
+        newUser.setVerificationCode(verificationCode);
+        newUser.setCodeExpirationTime(LocalDateTime.now().plusMinutes(10));
+
         userRepository.save(newUser);
         roleService.save(UserRoles.ROLE_USER, newUser.getId());
-        emailSendingService.sendRegistrationEmail(registrationDTO.getPhoneNumber(), newUser.getId());
-        return "Tizimga kirdingiz";
+        return "Tasdiqlash kodi yuborildi";
     }
 
     public String regVerification(Long id) {
@@ -64,5 +69,14 @@ public class AuthService {
             return "Tizimga muvaffaqiyatli kirdingiz";
         }
         throw new BadException("Muvaffaqiyatsiz urinish");
+    }
+
+    public static String generateVerificationCode(int length) {
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            code.append(random.nextInt(10));
+        }
+        return code.toString();
     }
 }

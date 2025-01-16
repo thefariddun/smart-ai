@@ -30,7 +30,7 @@ public class SpringConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         String password = UUID.randomUUID().toString();
-
+        System.out.println("password: " + password);
         UserDetails user = User.builder()
                 .username("user")
                 .password("{noop}" + password)
