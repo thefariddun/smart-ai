@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import uz.smart_ai.smart_ai.dto.LoginDTO;
 import uz.smart_ai.smart_ai.dto.RegistrationDTO;
 import uz.smart_ai.smart_ai.entity.User;
 import uz.smart_ai.smart_ai.enums.GeneralStatus;
@@ -33,7 +34,7 @@ public class AuthService {
     private UserService userService;
 
     public String registration(RegistrationDTO registrationDTO) {
-        logger.info("registration");
+        logger.info("Ro‘yxatdan o‘tish jarayoni boshlandi");
         Optional<User> user = userRepository.findByPhoneNumberAndVisibleTrue(registrationDTO.getPhoneNumber());
 
         if (user.isPresent()) {
@@ -59,16 +60,25 @@ public class AuthService {
 
         userRepository.save(newUser);
         roleService.save(UserRoles.ROLE_USER, newUser.getId());
+        emailSendingService.sendRegistrationEmail(registrationDTO.getPhoneNumber(), verificationCode);
         return "Tasdiqlash kodi yuborildi";
     }
 
-    public String regVerification(Long id) {
-        User user = userService.getById(id);
-        if (user.getStatus().equals(GeneralStatus.IN_REGISTER)) {
-            userRepository.changeStatus(id, GeneralStatus.ACTIVE);
-            return "Tizimga muvaffaqiyatli kirdingiz";
+    public String verifyRegistration(String phoneNumber, String verificationCode) {
+        logger.info("Email ga kod yuborish boshlandi");
+        User user = userRepository.findByPhoneNumberAndVisibleTrue(phoneNumber)
+                .orElseThrow(() -> new BadException("Foydalanuvchi topilmadi"));
+
+        if (!user.getVerificationCode().equals(verificationCode)) {
+            throw new BadException("Tasdiqlash kodi noto‘g‘ri");
         }
-        throw new BadException("Muvaffaqiyatsiz urinish");
+
+        if (user.getCodeExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new BadException("Tasdiqlash kodi muddati tugagan");
+        }
+
+        userRepository.changeStatus(user.getId(), GeneralStatus.ACTIVE);
+        return "Hisobingiz muvaffaqiyatli tasdiqlandi";
     }
 
     public static String generateVerificationCode(int length) {
@@ -78,5 +88,24 @@ public class AuthService {
             code.append(random.nextInt(10));
         }
         return code.toString();
+    }
+
+    public String login(LoginDTO loginDTO) {
+        User user = userRepository.findByPhoneNumberAndVisibleTrue(loginDTO.getPhoneNumber())
+                .orElseThrow(() -> new BadException("Foydalanuvchi topilmadi"));
+
+        if (!bCryptPasswordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new BadException("Noto'g'ri parol");
+        }
+
+        if (user.getStatus().equals(GeneralStatus.IN_REGISTER)) {
+            throw new BadException("Foydalanuvchi hali tasdiqlanmagan");
+        }
+
+        if (user.getStatus().equals(GeneralStatus.BLOCKED)) {
+            throw new BadException("Sizning hisobingiz bloklangan");
+        }
+
+        return "Login muvaffaqiyatli amalga oshirildi";
     }
 }

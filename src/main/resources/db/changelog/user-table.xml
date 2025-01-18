@@ -62,7 +62,7 @@
 
     <changeSet id="6" author="thefariddun">
         <addColumn tableName="users">
-            <column name="code_expiration_time" type="varchar">
+            <column name="code_expiration_time" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

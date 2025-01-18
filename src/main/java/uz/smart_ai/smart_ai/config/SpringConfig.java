@@ -31,9 +31,10 @@ public class SpringConfig {
     public AuthenticationProvider authenticationProvider() {
         String password = UUID.randomUUID().toString();
         System.out.println("password: " + password);
+        String encodedPassword = bCryptPasswordEncoder().encode(password);
         UserDetails user = User.builder()
                 .username("user")
-                .password("{noop}" + password)
+                .password(encodedPassword)
                 .roles("USER")
                 .build();
 
@@ -46,7 +47,7 @@ public class SpringConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
             authorizationManagerRequestMatcherRegistry
-                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/auth/**", "/registration/verify", "/auth/login").permitAll()
                     .anyRequest()
                     .authenticated();
         });
