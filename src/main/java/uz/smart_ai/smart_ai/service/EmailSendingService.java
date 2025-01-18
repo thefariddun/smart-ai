@@ -29,11 +29,11 @@ public class EmailSendingService {
             mailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Email yuborishda xatolik yuz berdi", e);
         }
     }
 
-    public void sendRegistrationEmail(String phoneNumber, Long id) {
+    public void sendRegistrationEmail(String phoneNumber, String verificationCode) {
         String subject = "Complete Registration";
         String body =
                 "<!DOCTYPE html>\n" +
@@ -71,15 +71,16 @@ public class EmailSendingService {
                         "    <div class=\"container\">\n" +
                         "        <h1>Hisobingizni Tasdiqlang</h1>\n" +
                         "        <p>Hurmatli foydalanuvchi,</p>\n" +
-                        "        <p>Hisobingizni tasdiqlash uchun quyidagi tugmani bosing:</p>\n" +
-                        "        <a href=\"http://localhost:8080/auth/registration/verification/?id=" + id + "\">Tasdiqlash</a>\n" +
+                        "        <p>Hisobingizni tasdiqlash uchun quyidagi kodni kiritishingiz kerak:</p>\n" +
+                        "        <h2>" + verificationCode + "</h2>\n" +
                         "        <p>Agar ushbu so‘rovni siz yubormagan bo‘lsangiz, bu xabarni e'tiborsiz qoldiring.</p>\n" +
                         "        <div class=\"footer\">\n" +
-                        "            <p>© 2025 Sizning Loyihangiz. Barcha huquqlar himoyalangan.</p>\n" +
+                        "            <p>© 2025 Smart AI. Barcha huquqlar himoyalangan.</p>\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</body>\n" +
                         "</html>";
+
 
         sendMimeEmail(phoneNumber, subject, body);
     }
